@@ -6,6 +6,7 @@ import (
 	"job-portal/internal/models"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -133,4 +134,61 @@ func (h *handler) ViewJobByCompany(c *gin.Context) {
 
 	// Return the company data as JSON response
 	c.JSON(http.StatusOK, jobs)
+}
+
+func (h *handler) ApplyForJob(c *gin.Context) {
+	ctx := c.Request.Context()
+	traceId, ok := ctx.Value(middleware.TraceIdKey).(string)
+
+	if !ok {
+		log.Error().Msg("traceId missing from context")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	jIdStr := c.Param("id")
+	jId, err := strconv.Atoi(jIdStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
+		return
+	}
+
+	var Applications []models.JobApplication
+	err = json.NewDecoder(c.Request.Body).Decode(&Applications)
+	if err != nil {
+		log.Info().Msg("error while converting request body to JSON")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
+		return
+	}
+
+	validate := validator.New()
+	var wg sync.WaitGroup
+	userChan := make(chan models.Applicant, len(Applications))
+	for _, application := range Applications {
+		wg.Add(1)
+		go func(application models.JobApplication) {
+			defer wg.Done()
+			if err := validate.Struct(application); err != nil {
+				log.Error().Err(err).Str("Trace Id", traceId).Msgf("validation failed for an application %s", application.Name)
+				return
+			}
+			user, err := h.s.ApplyJob(application, jId)
+			if err != nil {
+				log.Error().Err(err).Str("Trace Id", traceId).Msg("error while applying job")
+				return
+			}
+
+			userChan <- user
+		}(application)
+	}
+	go func() {
+		wg.Wait()
+		close(userChan)
+	}()
+
+	var users []models.Applicant
+	for user := range userChan {
+		users = append(users, user)
+	}
+	c.JSON(http.StatusOK, users)
 }

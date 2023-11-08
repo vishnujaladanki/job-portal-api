@@ -36,3 +36,11 @@ func (r NewService) ViewJobByCompanyId(ctx context.Context, cId int) ([]models.J
 	}
 	return jobs, nil
 }
+
+func (r NewService) ApplyJob(application models.JobApplication, jId int) (models.Applicant, error) {
+	user, err := r.rp.Process(application, jId)
+	if err != nil {
+		return models.Applicant{}, err
+	}
+	return user, nil
+}

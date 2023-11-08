@@ -40,6 +40,21 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
+// ApplyJob mocks base method.
+func (m *MockService) ApplyJob(application models.JobApplication, jId int) (models.Applicant, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplyJob", application, jId)
+	ret0, _ := ret[0].(models.Applicant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplyJob indicates an expected call of ApplyJob.
+func (mr *MockServiceMockRecorder) ApplyJob(application, jId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyJob", reflect.TypeOf((*MockService)(nil).ApplyJob), application, jId)
+}
+
 // Authenticate mocks base method.
 func (m *MockService) Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims, error) {
 	m.ctrl.T.Helper()
