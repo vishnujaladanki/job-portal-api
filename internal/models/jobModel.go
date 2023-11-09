@@ -78,14 +78,12 @@ type JobApplication struct {
 	Name            string `json:"name" validate:"required"`
 	Email           string `json:"email" validate:"required"`
 	Age             int    `json:"age" validate:"required"`
-	Min_NP          int    `json:"min_np" validate:"required"`
-	Max_NP          int    `json:"max_np" validate:"required"`
-	Budget          int    `json:"budget" validate:"required"`
+	NoticePeriod    int    `json:"notice_period" validate:"required"`
+	Expect_salary   int    `json:"expect_salary" validate:"required"`
 	JobLocations    []uint `json:"job_location" validate:"required"`
 	TechnologyStack []uint `json:"technology_stack" validate:"required"`
 	WorkModes       []uint `json:"work_mode" validate:"required"`
-	MinExp          int    `json:"min_exp" validate:"required"`
-	MaxExp          int    `json:"max_exp" validate:"required"`
+	Experience      int    `json:"experience" validate:"required"`
 	Qualifications  []uint `json:"qualification" validate:"required"`
 	WorkShifts      []uint `json:"work_shift" validate:"required"`
 	JobTypes        []uint `json:"job_type" validate:"required"`
