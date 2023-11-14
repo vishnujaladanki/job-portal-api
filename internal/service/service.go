@@ -23,7 +23,7 @@ type Service interface {
 	CreateCompany(ctx context.Context, ni models.NewCompany) (models.Company, error)
 	ViewCompany(ctx context.Context) ([]models.Company, error)
 	GetCompanyInfoByID(ctx context.Context, uid int) (models.Company, error)
-	ApplyJob(application models.JobApplication, jId int) (models.Applicant, error)
+	ApplyJob(application []models.JobApplication, jId int) ([]models.Applicant, error)
 }
 
 func NewServiceStore(s repository.Repository) Service {

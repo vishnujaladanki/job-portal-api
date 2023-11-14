@@ -297,3 +297,151 @@ func TestNewService_ViewJobByCompanyId(t *testing.T) {
 		})
 	}
 }
+
+func TestNewService_ApplyJob(t *testing.T) {
+	type args struct {
+		application []models.JobApplication
+		jId         int
+	}
+	tests := []struct {
+		name string
+		//r       NewService
+		args         args
+		want         []models.Applicant
+		wantErr      bool
+		mockResponse func() (models.Job, error)
+	}{
+		{
+			name: "sucess case function",
+			args: args{
+				application: []models.JobApplication{
+					{
+						Name:            "vishnu",
+						Email:           "vishnu@gmail.com",
+						Age:             24,
+						NoticePeriod:    3,
+						Expect_salary:   500000,
+						JobLocations:    []uint{1, 2},
+						TechnologyStack: []uint{1, 2},
+						WorkModes:       []uint{1, 2},
+						Experience:      3,
+						Qualifications:  []uint{1, 2},
+						WorkShifts:      []uint{1, 2},
+						JobTypes:        []uint{1, 2},
+					},
+					{
+						Name:            "krishna",
+						Email:           "krishna@gmail.com",
+						Age:             24,
+						NoticePeriod:    3,
+						Expect_salary:   500000,
+						JobLocations:    []uint{1, 2},
+						TechnologyStack: []uint{1, 2},
+						WorkModes:       []uint{1, 2},
+						Experience:      3,
+						Qualifications:  []uint{1, 2},
+						WorkShifts:      []uint{1, 2},
+						JobTypes:        []uint{1, 2},
+					},
+					{
+						Name:            "vikram",
+						Email:           "vikram@gmail.com",
+						Age:             24,
+						NoticePeriod:    3,
+						Expect_salary:   500000,
+						JobLocations:    []uint{3},
+						TechnologyStack: []uint{3},
+						WorkModes:       []uint{3},
+						Experience:      3,
+						Qualifications:  []uint{3},
+						WorkShifts:      []uint{3},
+						JobTypes:        []uint{3},
+					},
+				},
+				jId: 1,
+			},
+			want:    []models.Applicant{{Name: "vishnu", Email: "vishnu@gmail.com", Age: 24}, {Name: "krishna", Email: "krishna@gmail.com", Age: 24}},
+			wantErr: false,
+			mockResponse: func() (models.Job, error) {
+				return models.Job{
+					ID:              1,
+					Title:           "Java Developper",
+					Description:     "train hire and deploy",
+					CompanyID:       3,
+					Min_NP:          1,
+					Max_NP:          3,
+					Budget:          500000,
+					JobLocations:    []models.Location{{ID: 1, Name: "banglore"}, {ID: 2, Name: "hyderabad"}},
+					TechnologyStack: []models.Technology{{ID: 1, Name: "java"}, {ID: 2, Name: "sql"}},
+					WorkModes:       []models.WorkMode{{ID: 1, Name: "remote"}, {ID: 2, Name: "work from office"}},
+					MinExp:          1,
+					MaxExp:          3,
+					Qualifications:  []models.Qualification{{ID: 1, Name: "B.Tech"}, {ID: 2, Name: "M.Tech"}},
+					Shifts:          []models.Shift{{ID: 1, Name: "day"}, {ID: 2, Name: "night"}},
+					JobTypes:        []models.JobType{{ID: 1, Name: "part time"}, {ID: 2, Name: "contract"}},
+				}, nil
+			},
+		},
+
+		{
+			name: "error in db",
+			args: args{
+				application: []models.JobApplication{
+					{
+						Name:            "vishnu",
+						Email:           "vishnu@gmail.com",
+						Age:             24,
+						NoticePeriod:    3,
+						Expect_salary:   500000,
+						JobLocations:    []uint{1, 2},
+						TechnologyStack: []uint{1, 2},
+						WorkModes:       []uint{1, 2},
+						Experience:      3,
+						Qualifications:  []uint{1, 2},
+						WorkShifts:      []uint{1, 2},
+						JobTypes:        []uint{1, 2},
+					},
+					{
+						Name:            "vikram",
+						Email:           "vikram@gmail.com",
+						Age:             24,
+						NoticePeriod:    3,
+						Expect_salary:   500000,
+						JobLocations:    []uint{3},
+						TechnologyStack: []uint{3},
+						WorkModes:       []uint{3},
+						Experience:      3,
+						Qualifications:  []uint{3},
+						WorkShifts:      []uint{3},
+						JobTypes:        []uint{3},
+					},
+				},
+				jId: 1,
+			},
+			want:    nil,
+			wantErr: true,
+			mockResponse: func() (models.Job, error) {
+				return models.Job{}, errors.New("")
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mc := gomock.NewController(t)
+			ms := repository.NewMockRepository(mc)
+			if tt.mockResponse != nil {
+				ms.EXPECT().Process(gomock.Any()).Return(tt.mockResponse()).AnyTimes()
+			}
+			r := NewServiceStore(ms)
+
+			got, err := r.ApplyJob(tt.args.application, tt.args.jId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewService.ApplyJob() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewService.ApplyJob() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"job-portal/internal/models"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 )
@@ -40,18 +41,15 @@ func (r NewService) ViewJobByCompanyId(ctx context.Context, cId int) ([]models.J
 	return jobs, nil
 }
 
-func (r NewService) ApplyJob(application models.JobApplication, jId int) (models.Applicant, error) {
+func CompareCriteria(application models.JobApplication, job models.Job) (models.Applicant, error) {
 	user := models.Applicant{
 		Name:  application.Name,
 		Email: application.Email,
 		Age:   application.Age,
 	}
 	var count int
-	job, err := r.rp.Process(jId)
-	if err != nil {
-		return models.Applicant{}, err
-	}
-	err = errors.New("")
+
+	err := errors.New("")
 	if application.Expect_salary <= job.Budget {
 		log.Info().Str("Budget", "true").Send()
 		count++
@@ -164,6 +162,37 @@ func (r NewService) ApplyJob(application models.JobApplication, jId int) (models
 	}
 
 	return models.Applicant{}, err
+}
+func (r NewService) ApplyJob(valid_application []models.JobApplication, jId int) ([]models.Applicant, error) {
+	var users []models.Applicant
+	job, err := r.rp.Process(jId)
+	if err != nil {
+		return nil, err
+	}
+	var wg sync.WaitGroup
+	userChan := make(chan models.Applicant, len(valid_application))
+	for _, application := range valid_application {
+		wg.Add(1)
+		go func(application models.JobApplication, job models.Job) {
+			defer wg.Done()
+			user, err := CompareCriteria(application, job)
+			if err != nil {
+				log.Error().Err(err).Msgf("error while comparing the %s applicartion with job criteria", application.Name)
+				return
+			}
+
+			userChan <- user
+		}(application, job)
+	}
+	go func() {
+		wg.Wait()
+		close(userChan)
+	}()
+
+	for user := range userChan {
+		users = append(users, user)
+	}
+	return users, nil
 }
 
 // function to check the slices

@@ -41,10 +41,10 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // ApplyJob mocks base method.
-func (m *MockService) ApplyJob(application models.JobApplication, jId int) (models.Applicant, error) {
+func (m *MockService) ApplyJob(application []models.JobApplication, jId int) ([]models.Applicant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ApplyJob", application, jId)
-	ret0, _ := ret[0].(models.Applicant)
+	ret0, _ := ret[0].([]models.Applicant)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
