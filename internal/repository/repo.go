@@ -27,6 +27,8 @@ type Repository interface {
 	ViewCompanies() ([]models.Company, error)
 	GetCompanyByID(uid int) (models.Company, error)
 	Process(jId int) (models.Job, error)
+	CheckUserEmail(email string) (bool, error)
+	UpdateUserPassword(np models.Reset) (bool, error)
 }
 
 // type RepoStore struct {

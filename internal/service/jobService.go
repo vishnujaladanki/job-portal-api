@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"job-portal/cmd/rediss"
 	"job-portal/internal/models"
+	"strconv"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -163,26 +167,75 @@ func CompareCriteria(application models.JobApplication, job models.Job) (models.
 
 	return models.Applicant{}, err
 }
-func (r NewService) ApplyJob(valid_application []models.JobApplication, jId int) ([]models.Applicant, error) {
+func (r NewService) ApplyJob(valid_application []models.JobApplication) ([]models.Applicant, error) {
 	var users []models.Applicant
-	job, err := r.rp.Process(jId)
-	if err != nil {
-		return nil, err
-	}
+	var jobModel models.Job
 	var wg sync.WaitGroup
+	rc := rediss.RedisClient()
+	ctx := context.Background()
 	userChan := make(chan models.Applicant, len(valid_application))
 	for _, application := range valid_application {
 		wg.Add(1)
-		go func(application models.JobApplication, job models.Job) {
+		go func(application models.JobApplication) {
 			defer wg.Done()
-			user, err := CompareCriteria(application, job)
+			RedisKey := strconv.Itoa(application.JobId)
+			retrievedJob, err := rc.Get(ctx, RedisKey).Result()
+			//if err == redis.Nil {
+			// job, err := r.rp.Process(application.JobId)
+			// if err != nil {
+			// 	return
+			// }
+			// jobJSON, err := json.Marshal(job)
+			// if err != nil {
+			// 	log.Error().Msgf("1 %v", err)
+			// }
+			// err = rc.Set(ctx, RedisKey, jobJSON, time.Hour).Err()
+			// if err != nil {
+			// 	log.Error().Msgf("2 %v", err)
+			// 	return
+			// }
+			// retrievedJob, err = rc.Get(ctx, RedisKey).Result()
+			// if err != nil {
+			// 	log.Error().Msgf("3 %v", err)
+			// 	return
+			// }
+
+			// }
+			if err != nil {
+				job, err := r.rp.Process(application.JobId)
+				if err != nil {
+					log.Error().Msgf("%v", err)
+					return
+				}
+				jobJSON, err := json.Marshal(job)
+				if err != nil {
+					log.Error().Msgf("1 %v", err)
+				}
+				err = rc.Set(ctx, RedisKey, jobJSON, time.Hour).Err()
+				if err != nil {
+					log.Error().Msgf("2 %v", err)
+					return
+				}
+				retrievedJob, err = rc.Get(ctx, RedisKey).Result()
+				if err != nil {
+					log.Error().Msgf("3 %v", err)
+					return
+				}
+			}
+			err = json.Unmarshal([]byte(retrievedJob), &jobModel)
+			if err != nil {
+				log.Error().Msgf("%v", err)
+				return
+			}
+
+			user, err := CompareCriteria(application, jobModel)
 			if err != nil {
 				log.Error().Err(err).Msgf("error while comparing the %s applicartion with job criteria", application.Name)
 				return
 			}
 
 			userChan <- user
-		}(application, job)
+		}(application)
 	}
 	go func() {
 		wg.Wait()

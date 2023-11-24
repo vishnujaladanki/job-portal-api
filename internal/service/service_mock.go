@@ -41,18 +41,18 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // ApplyJob mocks base method.
-func (m *MockService) ApplyJob(application []models.JobApplication, jId int) ([]models.Applicant, error) {
+func (m *MockService) ApplyJob(application []models.JobApplication) ([]models.Applicant, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ApplyJob", application, jId)
+	ret := m.ctrl.Call(m, "ApplyJob", application)
 	ret0, _ := ret[0].([]models.Applicant)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ApplyJob indicates an expected call of ApplyJob.
-func (mr *MockServiceMockRecorder) ApplyJob(application, jId any) *gomock.Call {
+func (mr *MockServiceMockRecorder) ApplyJob(application any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyJob", reflect.TypeOf((*MockService)(nil).ApplyJob), application, jId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyJob", reflect.TypeOf((*MockService)(nil).ApplyJob), application)
 }
 
 // Authenticate mocks base method.
@@ -68,6 +68,21 @@ func (m *MockService) Authenticate(ctx context.Context, email, password string) 
 func (mr *MockServiceMockRecorder) Authenticate(ctx, email, password any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockService)(nil).Authenticate), ctx, email, password)
+}
+
+// CheckEmail mocks base method.
+func (m *MockService) CheckEmail(e string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckEmail", e)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckEmail indicates an expected call of CheckEmail.
+func (mr *MockServiceMockRecorder) CheckEmail(e any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckEmail", reflect.TypeOf((*MockService)(nil).CheckEmail), e)
 }
 
 // CreateCompany mocks base method.
@@ -143,6 +158,21 @@ func (m *MockService) GetJobInfoByID(ctx context.Context, jId int) (models.Job, 
 func (mr *MockServiceMockRecorder) GetJobInfoByID(ctx, jId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobInfoByID", reflect.TypeOf((*MockService)(nil).GetJobInfoByID), ctx, jId)
+}
+
+// UpdatePassword mocks base method.
+func (m *MockService) UpdatePassword(np models.Reset) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", np)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockServiceMockRecorder) UpdatePassword(np any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockService)(nil).UpdatePassword), np)
 }
 
 // ViewCompany mocks base method.

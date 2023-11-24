@@ -145,15 +145,15 @@ func (h *handler) ApplyForJob(c *gin.Context) {
 		return
 	}
 
-	jIdStr := c.Param("id")
-	jId, err := strconv.Atoi(jIdStr)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
-		return
-	}
+	// jIdStr := c.Param("id")
+	// jId, err := strconv.Atoi(jIdStr)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
+	// 	return
+	// }
 
 	var Applications []models.JobApplication
-	err = json.NewDecoder(c.Request.Body).Decode(&Applications)
+	err := json.NewDecoder(c.Request.Body).Decode(&Applications)
 	if err != nil {
 		log.Info().Msg("error while converting request body to JSON")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
@@ -170,7 +170,7 @@ func (h *handler) ApplyForJob(c *gin.Context) {
 		}
 		valid_applications = append(valid_applications, a)
 	}
-	users, err := h.s.ApplyJob(valid_applications, jId)
+	users, err := h.s.ApplyJob(valid_applications)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -579,7 +579,7 @@ func Test_handler_ApplyForJob(t *testing.T) {
 
 				mc := gomock.NewController(t)
 				ms := service.NewMockService(mc)
-				ms.EXPECT().ApplyJob(gomock.Any(), gomock.Any()).Return([]models.Applicant{}, errors.New("error in adding job"))
+				ms.EXPECT().ApplyJob(gomock.Any()).Return([]models.Applicant{}, errors.New("error in adding job"))
 
 				return c, rr, ms
 			},
@@ -628,7 +628,7 @@ func Test_handler_ApplyForJob(t *testing.T) {
 
 				mc := gomock.NewController(t)
 				ms := service.NewMockService(mc)
-				ms.EXPECT().ApplyJob(gomock.Any(), gomock.Any()).Return([]models.Applicant{}, nil)
+				ms.EXPECT().ApplyJob(gomock.Any()).Return([]models.Applicant{}, nil)
 
 				return c, rr, ms
 			},

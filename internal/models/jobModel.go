@@ -78,6 +78,7 @@ type JobApplication struct {
 	Name            string `json:"name" validate:"required"`
 	Email           string `json:"email" validate:"required"`
 	Age             int    `json:"age" validate:"required"`
+	JobId           int    `json:"job_Id" validate:"required"`
 	NoticePeriod    int    `json:"notice_period" validate:"required"`
 	Expect_salary   int    `json:"expect_salary" validate:"required"`
 	JobLocations    []uint `json:"job_location" validate:"required"`

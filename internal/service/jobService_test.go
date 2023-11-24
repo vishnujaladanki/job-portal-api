@@ -391,6 +391,7 @@ func TestNewService_ApplyJob(t *testing.T) {
 						Name:            "vishnu",
 						Email:           "vishnu@gmail.com",
 						Age:             24,
+						JobId:           1,
 						NoticePeriod:    3,
 						Expect_salary:   500000,
 						JobLocations:    []uint{1, 2},
@@ -405,6 +406,7 @@ func TestNewService_ApplyJob(t *testing.T) {
 						Name:            "vikram",
 						Email:           "vikram@gmail.com",
 						Age:             24,
+						JobId:           2,
 						NoticePeriod:    3,
 						Expect_salary:   500000,
 						JobLocations:    []uint{3},
@@ -605,7 +607,7 @@ func TestNewService_ApplyJob(t *testing.T) {
 			}
 			r := NewServiceStore(ms)
 
-			got, err := r.ApplyJob(tt.args.application, tt.args.jId)
+			got, err := r.ApplyJob(tt.args.application)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewService.ApplyJob() error = %v, wantErr %v", err, tt.wantErr)
 				return
