@@ -2,7 +2,7 @@ version: '3'
 
 services:
   gin-server:
-    image: job-portal-api:latest  # Replace with the actual image name for your Gin server
+    image: job-portal-api:latest  
     container_name: job-portal-api
     ports:
       - "8080:8080"

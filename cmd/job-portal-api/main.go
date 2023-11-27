@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"job-portal/internal/handlers"
 	"context"
 	"fmt"
 	"job-portal/internal/auth"
